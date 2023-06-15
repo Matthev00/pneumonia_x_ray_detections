@@ -49,4 +49,24 @@ def create_densenet(num_classes: int,
     return model, transform
 
 
+def create_googlenet(num_classes: int,
+                     device: torch.device = "cuda"):
 
+    weights = models.GoogLeNet_Weights.DEFAULT
+    model_transform = weights.transforms()
+    model = models.googlenet(weights).to(device)
+
+    transform = transforms.Compose([transforms.Grayscale(3),
+                                    model_transform])
+
+    # Fit classfier to problem
+    model.fc = torch.nn.Linear(
+        in_features=1024,
+        out_features=num_classes).to(device=device)
+
+    for param in model.parameters():
+        param.requires_grad_(False)
+    model.fc.requires_grad_(True)
+
+    model.name = "googlenet"
+    return model, transform
