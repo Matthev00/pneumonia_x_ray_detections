@@ -11,13 +11,6 @@ def create_effnetb2(num_classes: int,
 
     transform = transforms.Compose([transforms.Grayscale(3),
                                     model_transform])
-    # # Set 1 color chanel
-    # model.features[0][0] = torch.nn.Conv2d(in_channels=1,
-    #                                        out_channels=32,
-    #                                        kernel_size=(3, 3),
-    #                                        stride=(2, 2),
-    #                                        padding=(1, 1),
-    #                                        bias=False)
 
     # Fit classfier to problem
     model.classifier = torch.nn.Sequential(
@@ -31,6 +24,28 @@ def create_effnetb2(num_classes: int,
         param.requires_grad_ = False
 
     model.name = "effnetb2"
+    return model, transform
+
+
+def create_densenet(num_classes: int,
+                    device: torch.device = "cuda"):
+
+    model_weights = models.DenseNet121_Weights.DEFAULT
+    model_transform = model_weights.transforms()
+    model = models.densenet121(weights=model_weights).to(device)
+
+    transform = transforms.Compose([transforms.Grayscale(3),
+                                    model_transform])
+
+    # Fit classfier to problem
+    model.classifier = torch.nn.Linear(
+        in_features=1024,
+        out_features=num_classes).to(device=device)
+
+    for param in model.features:
+        param.requires_grad_(False)
+
+    model.name = "densenet"
     return model, transform
 
 
