@@ -12,6 +12,7 @@ from datetime import datetime
 from matplotlib import pyplot as plt
 from torch import nn
 from torchvision import transforms
+from torchinfo import summary
 from typing import Tuple
 
 
@@ -214,3 +215,11 @@ def pred_and_plot_image(model: nn.Module,
     plt.title(f'Pred: {class_names[img_label]} | Prob: {img_pred_probs.max():.3f}') # noqa 5501
     plt.axis(False)
     plt.show()
+
+
+def print_summary(model: torch.nn.Module):
+    print(summary(model=model,
+                  input_size=(1, 3, 288, 288),
+                  col_names=["input_size", "output_size", "num_params", "trainable"], # noqa 5501
+                  col_width=15,
+                  row_settings=["var_names"]))

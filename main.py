@@ -1,6 +1,5 @@
 import torch
-from torchvision import transforms, models
-from torchinfo import summary
+from torchvision import transforms
 
 import data_setup
 import utils
@@ -15,7 +14,7 @@ from PIL import Image
 def main():
     args = utils.parse_arguments()
     BATCH_SIZE = args.batch_size
-    EPOCHS = args.num_epochs
+    EPOCHS = args.num_epochs # noqa 5501
     NUM_WORKERS = os.cpu_count()
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
