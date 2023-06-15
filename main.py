@@ -1,8 +1,10 @@
 import torch
 from torchvision import transforms, models
+from torchinfo import summary
 
 import data_setup
 import utils
+import model_builder
 
 import os
 from pathlib import Path
@@ -32,38 +34,27 @@ def main():
         batch_size=BATCH_SIZE
     )
 
-    effnetb2_weights = models.EfficientNet_B2_Weights.DEFAULT
-    effnetb2_transforms = effnetb2_weights.transforms
-    effnetb2 = models.efficientnet_b2(weights=effnetb2_weights)
-
-    densenet_weights = models.DenseNet121_Weights.DEFAULT
-    densenet = models.densenet121(weights=densenet_weights)
-
-    googlenet_weights = models.GoogLeNet_Weights.DEFAULT
-    googlenet = models.GoogLeNet()
-
+    model, model_transform = model_builder.create_densenet(
+        num_classes=2,
+        device=device
+    )
 
     imgs = list(test_dir.glob("*/*.jpeg"))
     img_path = random.sample(population=imgs, k=1)[0]
     img = Image.open(img_path)
-    transformed_img = simple_transform(img).unsqueeze(dim=0)
+    transformed_img = model_transform(img).unsqueeze(dim=0)
 
-    print(effnetb2.features[0][0])
-    effnetb2.features[0][0] = torch.nn.Conv2d(1, 32,
-                                           padding=(1, 1),
-                                           bias=False,
-                                           stride=(2, 2),
-                                           kernel_size=(3, 3))
-    print(effnetb2.features[0][0])
-    effnetb2.to(device)
-    effnetb2.eval()
+    model.eval()
     with torch.inference_mode():
-        img_pred = effnetb2(transformed_img.to(device))
+        img_pred = model(transformed_img.to(device))
     label = torch.argmax(torch.softmax(img_pred, 1), 1)
-    print(label)
+    print(class_names[label])
 
-
-
+    utils.pred_and_plot_image(model=model,
+                              image_path=img_path,
+                              class_names=class_names,
+                              transform=model_transform)
+    # utils.print_summary(model)
 
 
 if __name__ == "__main__":
