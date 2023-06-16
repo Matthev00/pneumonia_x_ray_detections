@@ -4,6 +4,7 @@ from torchvision import transforms
 import data_setup
 import utils
 import model_builder
+import engine
 
 import os
 from pathlib import Path
@@ -49,11 +50,24 @@ def main():
     label = torch.argmax(torch.softmax(img_pred, 1), 1)
     print(class_names[label])
 
-    utils.pred_and_plot_image(model=model,
-                              image_path=img_path,
-                              class_names=class_names,
-                              transform=model_transform)
+    # utils.pred_and_plot_image(model=model,
+    #                           image_path=img_path,
+    #                           class_names=class_names,
+    #                           transform=model_transform)
     # utils.print_summary(model)
+
+    loss_fn = torch.nn.CrossEntropyLoss(label_smoothing=0.1)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-2)
+    results = engine.train(model=model,
+                           train_dataloader=train_dataloader,
+                           test_dataloader=test_dataloader,
+                           loss_fn=loss_fn,
+                           optimizer=optimizer,
+                           writer=utils.create_writer(experiment_name="test",
+                                                      model_name="xyz")
+                           )
+    print(results)
+    utils.plot_loss_curves(results=results)
 
 
 if __name__ == "__main__":
