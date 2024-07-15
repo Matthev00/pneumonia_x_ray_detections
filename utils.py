@@ -42,7 +42,7 @@ def parse_arguments():
     - batch size
     - num of epochs
     """
-    parser = argparse.ArgumentParser(description='Script train model TinyVGG')
+    parser = argparse.ArgumentParser(description='Script train model')
     parser.add_argument('--batch_size', type=int, default=32,
                         help='Batch size for training and testing')
     parser.add_argument('--num_epochs', type=int, default=5,

@@ -44,7 +44,7 @@ def train_step(model: torch.nn.Module,
         loss.backward()
 
         # Optimizer step
-        optimizer.step()
+        optimizer.step() 
 
         # Calculate acc across batch
         y_pred_class = torch.argmax(torch.softmax(y_pred, dim=1), dim=1)
